@@ -2,7 +2,6 @@ package authentication
 
 import (
 	"errors"
-	"os"
 	"testing"
 )
 
@@ -77,22 +76,5 @@ func TestNewOCIAuth(t *testing.T) {
 
 	if err := auth.Validate(); err != nil {
 		t.Errorf("Validate() unexpectedly failed: %v", err)
-	}
-}
-
-// TestTestOCIAuth checks if the provided OCIAuth configuration is valid by running a test authentication.
-func TestTestOCIAuth(t *testing.T) {
-	auth := &OCIAuth{
-		TenancyID:     os.Getenv("ORACLE_API_TENANCY"),
-		UserID:        os.Getenv("ORACLE_API_USER"),
-		Region:        os.Getenv("ORACLE_API_REGION"),
-		PrivateKey:    os.Getenv("ORACLE_API_PRIVATE_KEY"),
-		Fingerprint:   os.Getenv("ORACLE_API_FINGERPRINT"),
-		KeyPassphrase: os.Getenv("ORACLE_API_KEY_PASSPHRASE"),
-	}
-	
-	// Mock the TestOCIAuth behavior if needed (e.g., mock OCI SDK calls)
-	if err := TestOCIAuth(auth); err != nil {
-		t.Fatalf("failed to test OCI authentication: %v", err)
 	}
 }

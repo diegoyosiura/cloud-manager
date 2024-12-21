@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// TestNewAuthConfig_ValidAWS verifies that a valid AWS configuration is correctly initialized.
+// TestNewAuthConfig_ValidAWS verifica se uma configuração válida da AWS é corretamente inicializada.
 func TestNewAuthConfig_ValidAWS(t *testing.T) {
 	fields := map[string]string{
 		"aws_access_key_id":     "testAccessKey",
@@ -14,19 +14,15 @@ func TestNewAuthConfig_ValidAWS(t *testing.T) {
 
 	config, err := NewAuthConfig("aws", fields)
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("erro inesperado: %v", err)
 	}
 
 	if config.ProviderName != "aws" {
-		t.Errorf("expected provider to be 'aws', got '%s'", config.ProviderName)
-	}
-
-	if err := config.Validate(); err != nil {
-		t.Errorf("unexpected validation error for valid AWS config: %v", err)
+		t.Errorf("esperado provider 'aws', mas foi recebido '%s'", config.ProviderName)
 	}
 }
 
-// TestNewAuthConfig_InvalidProvider ensures that an unsupported provider returns an appropriate error.
+// TestNewAuthConfig_InvalidProvider garante que um provedor não suportado retorna o erro apropriado.
 func TestNewAuthConfig_InvalidProvider(t *testing.T) {
 	fields := map[string]string{
 		"irrelevant_field": "value",
@@ -34,40 +30,35 @@ func TestNewAuthConfig_InvalidProvider(t *testing.T) {
 
 	_, err := NewAuthConfig("unsupported", fields)
 	if err == nil {
-		t.Fatalf("expected error for unsupported provider, got nil")
+		t.Fatalf("esperado erro para provedor não suportado, mas foi recebido nil")
 	}
 
 	expectedErr := "unsupported provider: unsupported"
 	if err.Error() != expectedErr {
-		t.Fatalf("expected error message: %s, got: %v", expectedErr, err)
+		t.Fatalf("mensagem de erro esperada: %s, mas foi recebido: %v", expectedErr, err)
 	}
 }
 
-// TestAuthConfig_ValidateAWS_MissingFields ensures that missing required fields in AWS configuration produce an error.
-func TestAuthConfig_ValidateAWS_MissingFields(t *testing.T) {
+// TestNewAuthConfig_MissingAWSFields verifica se campos ausentes na configuração AWS disparam erros no construtor.
+func TestNewAuthConfig_MissingAWSFields(t *testing.T) {
 	fields := map[string]string{
 		"aws_secret_access_key": "testSecretKey",
 		"aws_region":            "us-east-1",
 	}
 
-	config, err := NewAuthConfig("aws", fields)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	err = config.Validate()
+	_, err := NewAuthConfig("aws", fields)
 	if err == nil {
-		t.Fatalf("expected error for missing AWSAccessKeyID, got nil")
+		t.Fatalf("esperado erro para campo AWSAccessKeyID ausente, mas foi recebido nil")
 	}
 
-	expectedErr := "missing AWSAccessKeyID"
+	expectedErr := "missing required AWS authentication fields: [AccessKeyID]"
 	if err.Error() != expectedErr {
-		t.Errorf("unexpected error message: expected %s, got: %v", expectedErr, err)
+		t.Errorf("mensagem de erro inesperada: esperado %s, mas recebido: %v", expectedErr, err)
 	}
 }
 
-// TestNewAuthConfig_ValidateGCP_Valid checks if a valid GCP configuration passes validation successfully.
-func TestNewAuthConfig_ValidateGCP_Valid(t *testing.T) {
+// TestNewAuthConfig_ValidGCP verifica se uma configuração válida do GCP passa na validação.
+func TestNewAuthConfig_ValidGCP(t *testing.T) {
 	fields := map[string]string{
 		"gcp_project_id": "testGCPProject",
 		"gcp_auth_json":  "{}",
@@ -75,38 +66,33 @@ func TestNewAuthConfig_ValidateGCP_Valid(t *testing.T) {
 
 	config, err := NewAuthConfig("gcp", fields)
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("erro inesperado: %v", err)
 	}
 
-	if err := config.Validate(); err != nil {
-		t.Errorf("unexpected validation error for valid GCP config: %v", err)
+	if config.ProviderName != "gcp" {
+		t.Errorf("esperado provider 'gcp', mas foi recebido '%s'", config.ProviderName)
 	}
 }
 
-// TestAuthConfig_ValidateGCP_MissingFields ensures appropriate error is returned for missing required GCP fields.
-func TestAuthConfig_ValidateGCP_MissingFields(t *testing.T) {
+// TestNewAuthConfig_MissingGCPFields verifica se campos ausentes na configuração GCP disparam erros no construtor.
+func TestNewAuthConfig_MissingGCPFields(t *testing.T) {
 	fields := map[string]string{
 		"gcp_auth_json": "{}",
 	}
 
-	config, err := NewAuthConfig("gcp", fields)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	err = config.Validate()
+	_, err := NewAuthConfig("gcp", fields)
 	if err == nil {
-		t.Fatalf("expected error for missing GCPProjectID, got nil")
+		t.Fatalf("esperado erro para campo GCPProjectID ausente, mas foi recebido nil")
 	}
 
-	expectedErr := "missing GCPProjectID"
+	expectedErr := "missing required GCP authentication fields"
 	if err.Error() != expectedErr {
-		t.Errorf("unexpected error message: expected %s, got: %v", expectedErr, err)
+		t.Errorf("mensagem de erro inesperada: esperado %s, mas recebido: %v", expectedErr, err)
 	}
 }
 
-// TestAuthConfig_ValidateOCI_Valid verifies that a valid OCI configuration is correctly validated.
-func TestAuthConfig_ValidateOCI_Valid(t *testing.T) {
+// TestNewAuthConfig_ValidOCI verifica se uma configuração válida da OCI é validada corretamente.
+func TestNewAuthConfig_ValidOCI(t *testing.T) {
 	fields := map[string]string{
 		"oci_tenancy_id":     "testTenancyID",
 		"oci_user_id":        "testUserID",
@@ -118,56 +104,30 @@ func TestAuthConfig_ValidateOCI_Valid(t *testing.T) {
 
 	config, err := NewAuthConfig("oci", fields)
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("erro inesperado: %v", err)
 	}
 
-	if err := config.Validate(); err != nil {
-		t.Errorf("unexpected validation error for valid OCI config: %v", err)
+	if config.ProviderName != "oci" {
+		t.Errorf("esperado provider 'oci', mas foi recebido '%s'", config.ProviderName)
 	}
 }
 
-// TestAuthConfig_ValidateOCI_MissingFields checks if appropriate errors are triggered for missing OCI fields.
-func TestAuthConfig_ValidateOCI_MissingFields(t *testing.T) {
+// TestNewAuthConfig_MissingOCIFields verifica se campos ausentes na configuração OCI disparam erros no construtor.
+func TestNewAuthConfig_MissingOCIFields(t *testing.T) {
 	fields := map[string]string{
-		"oci_user_id":        "testUserID",
-		"oci_region":         "us-ashburn-1",
-		"oci_private_key":    "testPrivateKey",
-		"oci_fingerprint":    "testFingerprint",
-		"oci_key_passphrase": "testPassphrase",
+		"oci_user_id":     "testUserID",
+		"oci_region":      "us-ashburn-1",
+		"oci_private_key": "testPrivateKey",
+		"oci_fingerprint": "testFingerprint",
 	}
 
-	config, err := NewAuthConfig("oci", fields)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	err = config.Validate()
+	_, err := NewAuthConfig("oci", fields)
 	if err == nil {
-		t.Fatalf("expected error for missing OCITenancyID, got nil")
+		t.Fatalf("esperado erro para campo OCITenancyID ausente, mas foi recebido nil")
 	}
 
-	expectedErr := "missing OCITenancyID"
+	expectedErr := "tenancy ID is required"
 	if err.Error() != expectedErr {
-		t.Errorf("unexpected error message: expected %s, got: %v", expectedErr, err)
-	}
-}
-
-// TestAuthConfig_Authenticate_VerifyIntegration tests the integration of the Authenticate method for supported providers.
-// Simulates success/failure based on field completion.
-func TestAuthConfig_Authenticate_VerifyIntegration(t *testing.T) {
-	fields := map[string]string{
-		"aws_access_key_id":     "testAccessKey",
-		"aws_secret_access_key": "testSecretKey",
-		"aws_region":            "us-east-1",
-	}
-
-	config, err := NewAuthConfig("aws", fields)
-	if err != nil {
-		t.Fatalf("unexpected error during initialization: %v", err)
-	}
-
-	err = config.Authenticate()
-	if err != nil {
-		t.Errorf("unexpected authentication error for valid AWS config: %v", err)
+		t.Errorf("mensagem de erro inesperada: esperado %s, mas recebido: %v", expectedErr, err)
 	}
 }

@@ -5,7 +5,7 @@ import (
 )
 
 func TestAzureAuthIntegration(t *testing.T) {
-	auth := AzureAuth{
+	auth := &AzureAuth{
 		ClientID:       "your-client-id",
 		ClientSecret:   "your-client-secret",
 		TenantID:       "your-tenant-id",

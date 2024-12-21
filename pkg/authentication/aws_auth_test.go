@@ -6,7 +6,7 @@ import (
 )
 
 func TestAWSAuthIntegration(t *testing.T) {
-	auth := AWSAuth{
+	auth := &AWSAuth{
 		AccessKeyID:     []byte(utils.GetEnvWithValidation("AWS_KEY")),
 		SecretAccessKey: []byte(utils.GetEnvWithValidation("AWS_SECRETE")),
 		Region:          utils.GetEnvWithValidation("AWS_REGION"),

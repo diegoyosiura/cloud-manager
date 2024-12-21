@@ -132,7 +132,7 @@ func (a *AWSAuth) Authenticate() error {
 
 // TestAWSAuth validates the AWSAuth configuration and performs an authentication test.
 // Ensures both validation and authentication logic function correctly.
-func TestAWSAuth(auth AWSAuth) error {
+func TestAWSAuth(auth *AWSAuth) error {
 	// Step 1: Validate the configuration before attempting authentication
 	if err := auth.Validate(); err != nil {
 		return fmt.Errorf("validation failed: %w", err) // Return error if validation fails

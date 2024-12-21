@@ -6,7 +6,7 @@ import (
 )
 
 func TestGCPAuthIntegration(t *testing.T) {
-	auth := GCPAuth{
+	auth := &GCPAuth{
 		ProjectID: utils.GetEnvWithValidation("GCP_KEY_ID"),
 		AuthJSON:  utils.GetEnvWithValidation("GCP_JSON_INFO"),
 	}

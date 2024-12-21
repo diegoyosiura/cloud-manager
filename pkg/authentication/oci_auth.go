@@ -29,6 +29,8 @@ type OCIAuth struct {
 	Authenticated bool                    // Tracks whether the user is successfully authenticated.
 	Client        identity.IdentityClient // The client used to interact with the OCI identity service.
 
+	privateKeyProvider common.ConfigurationProvider
+
 	mu sync.Mutex // A mutex used to ensure thread safety when accessing the struct.
 }
 
@@ -114,7 +116,7 @@ func (o *OCIAuth) Authenticate() error {
 	o.PrivateKey = strings.Replace(o.PrivateKey, "\\n", "\n", -1)
 
 	// Creates a new RawConfigurationProvider with the necessary credentials for OCI services.
-	privateKeyProvider := common.NewRawConfigurationProvider(
+	o.privateKeyProvider = common.NewRawConfigurationProvider(
 		o.TenancyID,      // The tenancy ID.
 		o.UserID,         // The user ID.
 		o.Region,         // The OCI region.
@@ -125,7 +127,7 @@ func (o *OCIAuth) Authenticate() error {
 
 	// Uses the configuration provider to create an OCI identity client.
 	var err error
-	o.Client, err = identity.NewIdentityClientWithConfigurationProvider(privateKeyProvider)
+	o.Client, err = identity.NewIdentityClientWithConfigurationProvider(o.privateKeyProvider)
 	if err != nil {
 		// Returns an error if the client cannot be created.
 		return fmt.Errorf("unable to create OCI Identity Client: %v", err)
@@ -147,25 +149,40 @@ func (o *OCIAuth) Authenticate() error {
 	return fmt.Errorf("authentication failed: no regions retrieved")
 }
 
-// TestOCIAuth validates the OCIAuth configuration and performs an authentication test.
-//
-// Parameters:
-// - auth: A pointer to an OCIAuth instance to validate and authenticate.
-//
-// Returns:
-// - nil if both validation and authentication succeed.
-// - An error if either validation or authentication fails.
-func TestOCIAuth(auth *OCIAuth) error {
-	// Step 1: Validate the configuration.
-	if err := auth.Validate(); err != nil {
-		return fmt.Errorf("validation failed: %w", err) // Wrap and return validation error.
+func (o *OCIAuth) GetAllRegions() ([]string, error) {
+	response, err := o.Client.ListRegions(context.Background())
+	if err != nil {
+		// Returns an error if the API call to list regions fails.
+		return nil, err
 	}
 
-	// Step 2: Authenticate and test the configuration.
-	if err := auth.Authenticate(); err != nil {
-		return fmt.Errorf("authentication test failed: %w", err) // Wrap and return authentication error.
+	var regions []string
+
+	for i := 0; i < len(response.Items); i++ {
+		regions = append(regions, *response.Items[i].Name)
 	}
 
-	// Return nil if the process is successful.
-	return nil
+	return regions, nil
+}
+
+func (o *OCIAuth) GetAllCompartments(request identity.ListCompartmentsRequest) ([]string, error) {
+	response, err := o.Client.ListCompartments(context.Background(), request)
+	if err != nil {
+		// Returns an error if the API call to list regions fails.
+		return nil, err
+	}
+
+	var regions []string
+
+	for i := 0; i < len(response.Items); i++ {
+		regions = append(regions, *response.Items[i].Name)
+	}
+
+	return regions, nil
+}
+
+func (o *OCIAuth) GetConfigurationProvider() common.ConfigurationProvider {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	return o.privateKeyProvider
 }

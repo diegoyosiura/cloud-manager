@@ -29,6 +29,8 @@ config/*.json
 config/*.yaml
 
 # OS generated files
+/tests/
+tests/
 .DS_Store
 Thumbs.db
 

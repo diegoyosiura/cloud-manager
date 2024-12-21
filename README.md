@@ -1,204 +1,213 @@
-# **OCI Authentication Library**
 
-This Go library facilitates authentication with **Oracle Cloud Infrastructure (OCI)** services. It provides an easy-to-use interface to validate and authenticate users using OCI credentials, along with utility methods to ensure the configuration is correct.
+# Cloud Manager
 
----
+**Cloud Manager** is a Go-based application designed to manage cloud resources across multiple providers, including AWS, Azure, Google Cloud Platform (GCP), and Oracle Cloud Infrastructure (OCI). The project emphasizes best practices and leverages the latest features of the Go programming language to ensure efficient and optimized cloud resource management.
 
-## **Features**
+## Project Structure
 
-- Validates OCI authentication parameters, like `TenancyID`, `UserID`, `Region`, `PrivateKey`, and `Fingerprint`.
-- Performs the authentication process using OCI's Identity Client.
-- Thread-safe implementation using `sync.Mutex` for safe concurrent access.
-- Includes testing functionality to verify successful authentication via listing OCI regions.
+The project is organized into several directories, each serving a specific purpose:
 
----
+```plaintext
+cloud-manager/
+├── cmd/
+│   └── main.go
+├── internal/
+│   ├── config/
+│   │   ├── config.go
+│   │   └── config_test.go
+│   └── utils/
+│       ├── utils.go
+│       └── utils_test.go
+├── pkg/
+│   └── authentication/
+│       ├── auth.go
+│       ├── auth_test.go
+│       ├── aws_auth.go
+│       ├── aws_auth_test.go
+│       ├── azure_auth.go
+│       ├── azure_auth_test.go
+│       ├── gcp_auth.go
+│       ├── gcp_auth_test.go
+│       ├── oci_auth.go
+│       ├── oci_auth_test.go
+│       └── debug.go
+├── .gitignore
+└── go.mod
+```
 
-## **Getting Started**
+### Directories and Their Roles
 
-### **Prerequisites**
+- **cmd/**: Contains the entry point of the application. The `main.go` file initializes and starts the application.
 
-1. **Go Environment**: Ensure that Go 1.21+ is installed on your system.
-2. **OCI SDK**: This library depends on Oracle's official Go SDK.
+- **internal/**: Houses internal packages that are not intended for external use.
+    - **config/**: Manages configuration settings for the application.
+        - `config.go`: Handles loading and parsing of configuration files.
+        - `config_test.go`: Contains tests for configuration management.
+    - **utils/**: Provides utility functions used throughout the application.
+        - `utils.go`: Includes helper functions for tasks like environment variable management.
+        - `utils_test.go`: Contains tests for utility functions.
 
-To install the OCI SDK:
+- **pkg/**: Contains packages that can be imported by other applications or services.
+    - **authentication/**: Manages authentication with various cloud providers.
+        - `auth.go`: Defines common authentication interfaces and structures.
+        - `auth_test.go`: Contains tests for the common authentication functionalities.
+        - `aws_auth.go`: Implements authentication methods for AWS.
+        - `aws_auth_test.go`: Contains tests for AWS authentication.
+        - `azure_auth.go`: Implements authentication methods for Azure.
+        - `azure_auth_test.go`: Contains tests for Azure authentication.
+        - `gcp_auth.go`: Implements authentication methods for GCP.
+        - `gcp_auth_test.go`: Contains tests for GCP authentication.
+        - `oci_auth.go`: Implements authentication methods for OCI.
+        - `oci_auth_test.go`: Contains tests for OCI authentication.
+        - `debug.go`: Provides debugging utilities for authentication processes.
+
+## Authentication Implementations
+
+The application provides authentication mechanisms for multiple cloud providers, each implemented in its respective file within the `pkg/authentication/` directory. Below is an overview of the authentication structures and methods for each provider:
+
+### AWS Authentication (`aws_auth.go`)
+
+- **AWSAuth Structure**: Holds AWS credentials and region information.
+  ```go
+  type AWSAuth struct {
+      AccessKeyID     string
+      SecretAccessKey string
+      Region          string
+  }
+  ```
+
+- **Validate Method**: Ensures all necessary fields are populated.
+  ```go
+  func (a *AWSAuth) Validate() error {
+      // Validation logic
+  }
+  ```
+
+- **TestAWSAuth Function**: Tests the AWS authentication by creating a session and performing a simple operation.
+  ```go
+  func TestAWSAuth(auth AWSAuth) error {
+      // Authentication testing logic
+  }
+  ```
+
+### Azure Authentication (`azure_auth.go`)
+
+- **AzureAuth Structure**: Holds Azure credentials and subscription information.
+  ```go
+  type AzureAuth struct {
+      ClientID       string
+      ClientSecret   string
+      TenantID       string
+      SubscriptionID string
+  }
+  ```
+
+- **Validate Method**: Ensures all necessary fields are populated.
+  ```go
+  func (a *AzureAuth) Validate() error {
+      // Validation logic
+  }
+  ```
+
+- **TestAzureAuth Function**: Tests the Azure authentication by creating a resource groups client and performing a simple operation.
+  ```go
+  func TestAzureAuth(auth AzureAuth) error {
+      // Authentication testing logic
+  }
+  ```
+
+### GCP Authentication (`gcp_auth.go`)
+
+- **GCPAuth Structure**: Holds GCP project ID and authentication JSON.
+  ```go
+  type GCPAuth struct {
+      ProjectID string
+      AuthJSON  string
+  }
+  ```
+
+- **Validate Method**: Ensures all necessary fields are populated.
+  ```go
+  func (g *GCPAuth) Validate() error {
+      // Validation logic
+  }
+  ```
+
+- **TestGCPAuth Function**: Tests the GCP authentication by creating a storage client and performing a simple operation.
+  ```go
+  func TestGCPAuth(auth GCPAuth) error {
+      // Authentication testing logic
+  }
+  ```
+
+### OCI Authentication (`oci_auth.go`)
+
+- **OCIAuth Structure**: Holds OCI credentials and tenancy information.
+  ```go
+  type OCIAuth struct {
+      TenancyID     string
+      UserID        string
+      PrivateKey    string
+      Fingerprint   string
+      Region        string
+      PrivateKeyPassphrase string
+  }
+  ```
+
+- **Validate Method**: Ensures all necessary fields are populated.
+  ```go
+  func (o *OCIAuth) Validate() error {
+      // Validation logic
+  }
+  ```
+
+- **TestOCIAuth Function**: Tests the OCI authentication by creating a compute client and performing a simple operation.
+  ```go
+  func TestOCIAuth(auth OCIAuth) error {
+      // Authentication testing logic
+  }
+  ```
+
+## Configuration Management
+
+The `internal/config/config.go` file manages the application's configuration settings. It includes functions to load and parse configuration files, ensuring that all necessary settings are correctly initialized before the application runs.
+
+## Utility Functions
+
+The `internal/utils/utils.go` file provides utility functions used throughout the application. For example:
+
+- **GetEnvWithValidation Function**: Retrieves an environment variable and ensures it is not empty.
+  ```go
+  func GetEnvWithValidation(key string) string {
+      // Function logic
+  }
+  ```
+
+- **GetOptionalEnv Function**: Retrieves an environment variable or returns a default value if the variable is not set.
+  ```go
+  func GetOptionalEnv(key, defaultValue string) string {
+      // Function logic
+  }
+  ```
+
+## Getting Started
+
+To build and run the application, ensure you have Go installed and properly configured. Clone the repository, navigate to the project directory, and execute the following commands:
+
 ```bash
-go get github.com/oracle/oci-go-sdk/v65
+go mod tidy
+go build -o cloud-manager ./cmd
+./cloud-manager
 ```
 
----
+## Testing
 
-### **Installation**
+The project includes tests for various components, located alongside their respective implementations. To run the tests, use the `go test` command:
 
-You can clone this repository or integrate the library by importing its package file(s) into your project:
 ```bash
-git clone <repository_url>
-cd <repository_folder>
+go test ./...
 ```
 
----
+This command will execute all tests in the project, ensuring that each component functions as expected.
 
-### **Usage**
-
-This library provides utility functions to perform validation, authentication, and testing. Below is an example usage of the library:
-
-```go
-package main
-
-import (
-	"log"
-	"authentication" // Replace with the actual package path
-)
-
-func main() {
-	// Define your OCI credentials
-	authFields := map[string]string{
-		"oci_tenancy_id":    "ocid1.tenancy.oc1..<unique_ID>",
-		"oci_user_id":       "ocid1.user.oc1..<unique_ID>",
-		"oci_region":        "us-ashburn-1",
-		"oci_private_key":   "<your-private-key>",
-		"oci_fingerprint":   "<your-fingerprint>",
-		"oci_key_passphrase": "<your-key-passphrase>", // Optional
-	}
-
-	// Initialize the OCI Auth configuration
-	auth, err := authentication.NewOCIAuthFromAuth(authFields)
-	if err != nil {
-		log.Fatalf("Failed to initialize OCI authentication: %v", err)
-	}
-
-	// Test Authentication
-	if err := authentication.TestOCIAuth(auth); err != nil {
-		log.Fatalf("Authentication failed: %v", err)
-	}
-
-	log.Println("Authentication successful!")
-}
-```
-
----
-
-## **Configuration Fields**
-
-The following fields must be provided to initialize and authenticate with OCI:
-
-| Field Name          | Description                                                                                     | Required | Example           |
-|---------------------|-------------------------------------------------------------------------------------------------|----------|-------------------|
-| `oci_tenancy_id`    | The tenancy ID for your OCI account.                                                           | Yes      | `"ocid1.tenancy.oc1..<unique_ID>"` |
-| `oci_user_id`       | The user ID for authentication.                                                                | Yes      | `"ocid1.user.oc1..<unique_ID>"` |
-| `oci_region`        | The OCI region for your requests.                                                              | Yes      | `"us-ashburn-1"`  |
-| `oci_private_key`   | The private key used for authentication.                                                       | Yes      | `"-----BEGIN PRIVATE KEY-----\n<key>\n-----END PRIVATE KEY-----"` |
-| `oci_fingerprint`   | The fingerprint of your private key.                                                           | Yes      | `"01:23:45:67:89:AB:CD:EF:01:23:45:67:89:AB:CD:EF"` |
-| `oci_key_passphrase`| The passphrase for your private key (only if required).                                         | No       | `"your-passphrase"` |
-
----
-
-## **Key Methods**
-
-### **NewOCIAuthFromAuth(fields map[string]string) (*OCIAuth, error)**
-
-- **Description**: Initializes a new instance of `OCIAuth` with the given configuration fields and validates them.
-- **Parameters**:
-    - `fields`: A map containing the OCI authentication details.
-- **Returns**:
-    - An `OCIAuth` instance or a validation error if required fields are missing.
-
-### **Validate() error**
-
-- **Description**: Ensures all mandatory fields are correctly provided in the configuration.
-- **Returns**:
-    - Returns `nil` if validation succeeds or an error indicating which field is missing.
-
-### **Authenticate() error**
-
-- **Description**: Authenticates with OCI by creating an Identity Client using the configured credentials. Performs a basic test by listing OCI regions to ensure the configuration is correct.
-- **Returns**:
-    - Returns `nil` if authentication is successful or an error if any step fails.
-
-### **TestOCIAuth(auth *OCIAuth) error**
-
-- **Description**: Combines validation and authentication to ensure the provided credentials work as expected.
-- **Parameters**:
-    - `auth`: The `OCIAuth` instance to be tested.
-- **Returns**:
-    - Returns `nil` on success or an error on failure.
-
----
-
-## **Error Handling**
-
-The library provides meaningful error messages throughout the validation and authentication processes. For example:
-- If a required field is missing, `Validate()` will indicate which field is missing.
-- Network errors during authentication and region listing will return detailed error messages to facilitate troubleshooting.
-
----
-
-## **Logging**
-
-The library uses Go's standard `log` package to display logs to the console. To integrate advanced logging, you can replace `log` with structured logging libraries like `logrus` or `zap`.
-
-Example with `logrus`:
-```go
-import "github.com/sirupsen/logrus"
-
-logrus.SetFormatter(&logrus.JSONFormatter{})
-logrus.Info("Logged with logrus")
-```
-
----
-
-## **Testing**
-
-### **Unit Tests**
-You can write unit tests to verify various functionalities, such as:
-1. Validation of input fields.
-2. Authenticating with mock credentials.
-3. Simulating OCI API calls (using mocks).
-
-### **Manual Testing**
-To manually test the authentication process, ensure your OCI credentials are correctly set and run the following:
-```bash
-go run main.go
-```
-
----
-
-## **Dependencies**
-
-This library requires the following dependencies:
-1. **OCI SDK for Go**: [github.com/oracle/oci-go-sdk](https://github.com/oracle/oci-go-sdk)
-2. **Standard Packages**:
-    - `context`
-    - `sync`
-    - `strings`
-    - `log`
-
----
-
-## **Roadmap**
-
-Future improvements for the library could include:
-- **Improved error messages** with additional details for failed OCI API requests.
-- **Timeout configurations** for network requests during authentication.
-- **Sensitive data cleanup** to remove private key/passphrase from memory after use.
-- **Structured logging** using libraries like `logrus` or `zap`.
-
----
-
-## **Contributing**
-
-We welcome contributions to improve this library! To contribute:
-1. Fork this repository.
-2. Create a feature branch: `git checkout -b feature-name`.
-3. Submit a pull request with a detailed description of your changes.
-
----
-
-## **License**
-
-This library is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
-
----
-
-## **Contact**
-
-For questions or suggestions, please contact the maintainer or open an issue on the repository.
+## Contributing

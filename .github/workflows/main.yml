@@ -1,0 +1,28 @@
+name: Security Checks
+
+on: [push, pull_request]
+
+jobs:
+  trufflehog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install TruffleHog
+        run: pip install truffleHog
+
+      - name: Run TruffleHog
+        run: trufflehog --regex --entropy=True .
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Gitleaks
+        run: curl -sSfL https://raw.githubusercontent.com/zricethezav/gitleaks/master/install.sh | bash
+
+      - name: Run Gitleaks
+        run: gitleaks detect --source . --report-path gitleaks-report.json

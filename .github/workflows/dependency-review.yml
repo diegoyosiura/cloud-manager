@@ -1,39 +1,44 @@
-# Dependency Review Action
-#
-# This Action will scan dependency manifest files that change as part of a Pull Request,
-# surfacing known-vulnerable versions of the packages declared or updated in the PR.
-# Once installed, if the workflow run is marked as required, PRs introducing known-vulnerable
-# packages will be blocked from merging.
-#
-# Source repository: https://github.com/actions/dependency-review-action
-# Public documentation: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
+# Name of the workflow that will appear in the "Actions" tab of the repository.
 name: 'Dependency review'
+
+# Specifies the events that trigger this workflow.
+# In this case, the workflow runs when a Pull Request is opened, updated, or synchronized
+# against the specified branches (main, develop, or any branch matching the pattern feature/*).
 on:
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+      - develop
+      - "feature/*"
 
-# If using a dependency submission action in this workflow this permission will need to be set to:
-#
-# permissions:
-#   contents: write
-#
-# https://docs.github.com/en/enterprise-cloud@latest/code-security/supply-chain-security/understanding-your-software-supply-chain/using-the-dependency-submission-api
+# Permissions required for the workflow to function correctly.
+# - contents: read -> Allows reading the contents of the repository.
+# - pull-requests: write -> Required to use the "comment-summary-in-pr" option, which
+#   adds a comment in the Pull Request with a summary of the analysis.
 permissions:
   contents: read
-  # Write permissions for pull-requests are required for using the `comment-summary-in-pr` option, comment out if you aren't using this option
   pull-requests: write
 
+# Definition of the jobs for this workflow.
+# A job is a unit of work executed on a specified runner.
 jobs:
   dependency-review:
+    # Specifies the execution environment. This job will run on GitHub-hosted
+    # runners using the latest Ubuntu image.
     runs-on: ubuntu-latest
+
+    # A collection of steps to be executed as part of the job.
     steps:
+      # Step 1: Checkout the code from the repository.
+      # This is necessary for the workflows to access the repository files and history.
       - name: 'Checkout repository'
         uses: actions/checkout@v4
+
+      # Step 2: Run the Dependency Review action.
+      # This action scans for any modified or introduced dependencies in the PR
+      # and checks for known vulnerabilities in those dependencies.
       - name: 'Dependency Review'
         uses: actions/dependency-review-action@v4
-        # Commonly enabled options, see https://github.com/actions/dependency-review-action#configuration-options for all available options.
         with:
+          # Enable commenting a summary of the dependency analysis directly in the Pull Request.
           comment-summary-in-pr: always
-        #   fail-on-severity: moderate
-        #   deny-licenses: GPL-1.0-or-later, LGPL-2.0-or-later
-        #   retry-on-snapshot-warnings: true

@@ -1,6 +1,11 @@
 
 # Cloud Manager
 
+![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/go.yml/badge.svg)
+![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/codeql.yml/badge.svg)
+![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/dependency-review.yml/badge.svg)
+
+
 **Cloud Manager** is a Go-based application designed to manage cloud resources across multiple providers, including AWS, Azure, Google Cloud Platform (GCP), and Oracle Cloud Infrastructure (OCI). The project emphasizes best practices and leverages the latest features of the Go programming language to ensure efficient and optimized cloud resource management.
 
 ## Project Structure

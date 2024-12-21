@@ -1,0 +1,35 @@
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+
+# Go build and test files
+/build/
+*.out
+
+# IDE specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+# JetBrains specific
+out/
+
+# Dependency directories (vendor-specific)
+/vendor/
+
+# Logs
+*.log
+
+# Config files and secrets
+*.env
+config/*.json
+config/*.yaml
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+

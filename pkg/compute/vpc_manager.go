@@ -37,6 +37,13 @@ func NewVPCManager(authConfig *authentication.AuthConfig) (Manager, error) {
 			return nil, fmt.Errorf("invalid OCI authentication config")
 		}
 		return &OCIManager{Auth: ociConfig}, nil
+	case "aws":
+		// Returns an AWS-specific manager implementation.
+		awsConfig, ok := authConfig.Config.(*authentication.AWSAuth)
+		if !ok {
+			return nil, fmt.Errorf("invalid OCI authentication config")
+		}
+		return &AWSManager{Auth: awsConfig}, nil
 
 	default:
 		// Returns an error if the cloud provider is unsupported.

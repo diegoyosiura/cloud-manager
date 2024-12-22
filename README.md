@@ -1,218 +1,95 @@
 
 # Cloud Manager
 
-![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/go.yml/badge.svg)
-![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/codeql.yml/badge.svg)
-![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/dependency-review.yml/badge.svg)
+**Cloud Manager** is a Go-based application designed to manage AWS VPCs and EC2 instances efficiently.
 
+## Features
 
-**Cloud Manager** is a Go-based application designed to manage cloud resources across multiple providers, including AWS, Azure, Google Cloud Platform (GCP), and Oracle Cloud Infrastructure (OCI). The project emphasizes best practices and leverages the latest features of the Go programming language to ensure efficient and optimized cloud resource management.
+- **AWSManager**: A dedicated manager for handling AWS resources.
+    - List all VPCs in a specified region.
+    - List all stopped EC2 instances.
+    - Attach EC2 instances to specific VPCs.
 
-## Project Structure
+## Example Usage
 
-The project is organized into several directories, each serving a specific purpose:
+The following example demonstrates how to use the `AWSManager` to interact with AWS resources.
 
-```plaintext
-cloud-manager/
-├── cmd/
-│   └── main.go
-├── internal/
-│   ├── config/
-│   │   ├── config.go
-│   │   └── config_test.go
-│   └── utils/
-│       ├── utils.go
-│       └── utils_test.go
-├── pkg/
-│   └── authentication/
-│       ├── auth.go
-│       ├── auth_test.go
-│       ├── aws_auth.go
-│       ├── aws_auth_test.go
-│       ├── azure_auth.go
-│       ├── azure_auth_test.go
-│       ├── gcp_auth.go
-│       ├── gcp_auth_test.go
-│       ├── oci_auth.go
-│       ├── oci_auth_test.go
-│       └── debug.go
-├── .gitignore
-└── go.mod
+```go
+func main() {
+    awsManager, err := NewAWSManager("us-east-1")
+    if err != nil {
+        fmt.Printf("Error creating AWSManager: %v\n", err)
+        return
+    }
+
+    // List stopped instances
+    stoppedInstances, err := awsManager.ListStoppedInstances()
+    if err != nil {
+        fmt.Printf("Error listing stopped instances: %v\n", err)
+        return
+    }
+
+    fmt.Println("Stopped instances:")
+    for _, instance := range stoppedInstances {
+        fmt.Printf("- Instance ID: %s\n", aws.StringValue(instance.InstanceId))
+    }
+
+    // List VPCs
+    vpcs, err := awsManager.ListVPCs()
+    if err != nil {
+        fmt.Printf("Error listing VPCs: %v\n", err)
+        return
+    }
+
+    fmt.Println("Available VPCs:")
+    for _, vpc := range vpcs {
+        fmt.Printf("- VPC ID: %s, CIDR: %s\n", aws.StringValue(vpc.VpcId), aws.StringValue(vpc.CidrBlock))
+    }
+
+    // Attach an instance to a VPC
+    err = awsManager.AttachInstanceToVPC("i-1234567890abcdef0", "subnet-12345678")
+    if err != nil {
+        fmt.Printf("Error attaching instance to VPC: %v\n", err)
+    }
+}
 ```
-
-### Directories and Their Roles
-
-- **cmd/**: Contains the entry point of the application. The `main.go` file initializes and starts the application.
-
-- **internal/**: Houses internal packages that are not intended for external use.
-    - **config/**: Manages configuration settings for the application.
-        - `config.go`: Handles loading and parsing of configuration files.
-        - `config_test.go`: Contains tests for configuration management.
-    - **utils/**: Provides utility functions used throughout the application.
-        - `utils.go`: Includes helper functions for tasks like environment variable management.
-        - `utils_test.go`: Contains tests for utility functions.
-
-- **pkg/**: Contains packages that can be imported by other applications or services.
-    - **authentication/**: Manages authentication with various cloud providers.
-        - `auth.go`: Defines common authentication interfaces and structures.
-        - `auth_test.go`: Contains tests for the common authentication functionalities.
-        - `aws_auth.go`: Implements authentication methods for AWS.
-        - `aws_auth_test.go`: Contains tests for AWS authentication.
-        - `azure_auth.go`: Implements authentication methods for Azure.
-        - `azure_auth_test.go`: Contains tests for Azure authentication.
-        - `gcp_auth.go`: Implements authentication methods for GCP.
-        - `gcp_auth_test.go`: Contains tests for GCP authentication.
-        - `oci_auth.go`: Implements authentication methods for OCI.
-        - `oci_auth_test.go`: Contains tests for OCI authentication.
-        - `debug.go`: Provides debugging utilities for authentication processes.
-
-## Authentication Implementations
-
-The application provides authentication mechanisms for multiple cloud providers, each implemented in its respective file within the `pkg/authentication/` directory. Below is an overview of the authentication structures and methods for each provider:
-
-### AWS Authentication (`aws_auth.go`)
-
-- **AWSAuth Structure**: Holds AWS credentials and region information.
-  ```go
-  type AWSAuth struct {
-      AccessKeyID     string
-      SecretAccessKey string
-      Region          string
-  }
-  ```
-
-- **Validate Method**: Ensures all necessary fields are populated.
-  ```go
-  func (a *AWSAuth) Validate() error {
-      // Validation logic
-  }
-  ```
-
-- **TestAWSAuth Function**: Tests the AWS authentication by creating a session and performing a simple operation.
-  ```go
-  func TestAWSAuth(auth AWSAuth) error {
-      // Authentication testing logic
-  }
-  ```
-
-### Azure Authentication (`azure_auth.go`)
-
-- **AzureAuth Structure**: Holds Azure credentials and subscription information.
-  ```go
-  type AzureAuth struct {
-      ClientID       string
-      ClientSecret   string
-      TenantID       string
-      SubscriptionID string
-  }
-  ```
-
-- **Validate Method**: Ensures all necessary fields are populated.
-  ```go
-  func (a *AzureAuth) Validate() error {
-      // Validation logic
-  }
-  ```
-
-- **TestAzureAuth Function**: Tests the Azure authentication by creating a resource groups client and performing a simple operation.
-  ```go
-  func TestAzureAuth(auth AzureAuth) error {
-      // Authentication testing logic
-  }
-  ```
-
-### GCP Authentication (`gcp_auth.go`)
-
-- **GCPAuth Structure**: Holds GCP project ID and authentication JSON.
-  ```go
-  type GCPAuth struct {
-      ProjectID string
-      AuthJSON  string
-  }
-  ```
-
-- **Validate Method**: Ensures all necessary fields are populated.
-  ```go
-  func (g *GCPAuth) Validate() error {
-      // Validation logic
-  }
-  ```
-
-- **TestGCPAuth Function**: Tests the GCP authentication by creating a storage client and performing a simple operation.
-  ```go
-  func TestGCPAuth(auth GCPAuth) error {
-      // Authentication testing logic
-  }
-  ```
-
-### OCI Authentication (`oci_auth.go`)
-
-- **OCIAuth Structure**: Holds OCI credentials and tenancy information.
-  ```go
-  type OCIAuth struct {
-      TenancyID     string
-      UserID        string
-      PrivateKey    string
-      Fingerprint   string
-      Region        string
-      PrivateKeyPassphrase string
-  }
-  ```
-
-- **Validate Method**: Ensures all necessary fields are populated.
-  ```go
-  func (o *OCIAuth) Validate() error {
-      // Validation logic
-  }
-  ```
-
-- **TestOCIAuth Function**: Tests the OCI authentication by creating a compute client and performing a simple operation.
-  ```go
-  func TestOCIAuth(auth OCIAuth) error {
-      // Authentication testing logic
-  }
-  ```
-
-## Configuration Management
-
-The `internal/config/config.go` file manages the application's configuration settings. It includes functions to load and parse configuration files, ensuring that all necessary settings are correctly initialized before the application runs.
-
-## Utility Functions
-
-The `internal/utils/utils.go` file provides utility functions used throughout the application. For example:
-
-- **GetEnvWithValidation Function**: Retrieves an environment variable and ensures it is not empty.
-  ```go
-  func GetEnvWithValidation(key string) string {
-      // Function logic
-  }
-  ```
-
-- **GetOptionalEnv Function**: Retrieves an environment variable or returns a default value if the variable is not set.
-  ```go
-  func GetOptionalEnv(key, defaultValue string) string {
-      // Function logic
-  }
-  ```
 
 ## Getting Started
 
-To build and run the application, ensure you have Go installed and properly configured. Clone the repository, navigate to the project directory, and execute the following commands:
+### Prerequisites
+
+- Install Go (1.19 or later).
+- Configure AWS credentials and set the `AWS_REGION` environment variable.
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone git@github.com:diegoyosiura/cloud-manager.git
+   cd cloud-manager
+   ```
+
+2. Install dependencies:
+   ```bash
+   go mod tidy
+   ```
+
+### Running the Application
+
+Run the `main.go` to interact with AWS resources:
 
 ```bash
-go mod tidy
-go build -o cloud-manager ./cmd
-./cloud-manager
+go run main.go
 ```
 
-## Testing
+### Testing
 
-The project includes tests for various components, located alongside their respective implementations. To run the tests, use the `go test` command:
+To run tests for the application, use:
 
 ```bash
-go test ./...
+go test ./... -v
 ```
 
-This command will execute all tests in the project, ensuring that each component functions as expected.
+## License
 
-## Contributing
+This project is licensed under the MIT License.

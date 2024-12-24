@@ -3,6 +3,8 @@
 ![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/go.yml/badge.svg)
 ![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/codeql.yml/badge.svg)
 ![Build Status](https://github.com/diegoyosiura/cloud-manager/actions/workflows/dependency-review.yml/badge.svg)
+
+
 **Cloud Manager** is a Go-based application designed to manage AWS VPCs and EC2 instances efficiently.
 
 ## Features

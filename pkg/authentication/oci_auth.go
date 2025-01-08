@@ -25,6 +25,11 @@ type OCIAuth struct {
 	PrivateKey    string // The private key for authentication (mandatory).
 	Fingerprint   string // Fingerprint of the private key (mandatory).
 	KeyPassphrase string // The passphrase for the private key (optional if the private key doesn't require it).
+	SMTPSecret    string // The passphrase for SMTP Authentication.
+	EmailHost     string // SMTP Host
+	EmailPort     string // SMTP Port
+	EmailUser     string // SMTP User
+	EmailPassword string // SMTP PWD
 
 	Authenticated bool                    // Tracks whether the user is successfully authenticated.
 	Client        identity.IdentityClient // The client used to interact with the OCI identity service.
@@ -52,6 +57,10 @@ func NewOCIAuthFromAuth(fields map[string]string) (*OCIAuth, error) {
 		PrivateKey:    fields["oci_private_key"],    // Reads the private key from the input fields.
 		Fingerprint:   fields["oci_fingerprint"],    // Reads the fingerprint from the input fields.
 		KeyPassphrase: fields["oci_key_passphrase"], // Reads the private key passphrase from the input fields.
+		EmailHost:     fields["email_host"],         // SMTP User
+		EmailPort:     fields["email_port"],         // SMTP User
+		EmailUser:     fields["email_user"],         // SMTP User
+		EmailPassword: fields["email_password"],     // SMTP PWD
 	}
 	// Validates the populated configuration to ensure all necessary fields are set.
 	return config, config.Validate()

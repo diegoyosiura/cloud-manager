@@ -14,6 +14,10 @@ type AzureAuth struct {
 	ClientSecret   string // Azure Client Secret used for authentication.
 	TenantID       string // Azure Tenant ID that the application belongs to.
 	SubscriptionID string // Azure Subscription ID to operate within.
+	EmailHost      string // SMTP Host
+	EmailPort      string // SMTP Port
+	EmailUser      string // SMTP User
+	EmailPassword  string // SMTP PWD
 
 	Authenticated bool                               // Tracks whether authentication was performed successfully.
 	Credential    *azidentity.ClientSecretCredential // Credential object used for authorization with Azure.
@@ -32,6 +36,10 @@ func NewAzureAuthFromAuth(fields map[string]string) (*AzureAuth, error) {
 		ClientSecret:   fields["azure_client_secret"],   // Extract Azure Client Secret from fields.
 		TenantID:       fields["azure_tenant_id"],       // Extract Azure Tenant ID from fields.
 		SubscriptionID: fields["azure_subscription_id"], // Extract Azure Subscription ID from fields.
+		EmailHost:      fields["email_host"],            // SMTP User
+		EmailPort:      fields["email_port"],            // SMTP User
+		EmailUser:      fields["email_user"],            // SMTP User
+		EmailPassword:  fields["email_password"],        // SMTP PWD
 	}
 	// Return the initialized AzureAuth structure and validate the configuration.
 	return config, config.Validate()

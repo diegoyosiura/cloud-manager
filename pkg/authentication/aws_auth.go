@@ -13,6 +13,10 @@ import (
 type AWSAuth struct {
 	AccessKeyID     []byte // AWS Access Key ID stored as a byte slice for security
 	SecretAccessKey []byte // AWS Secret Access Key stored as a byte slice for security
+	EmailHost       string // SMTP Host
+	EmailPort       string // SMTP Port
+	EmailUser       []byte // SMTP User
+	EmailPassword   []byte // SMTP PWD
 	Region          string // AWS Region for resource operations
 
 	Authenticated bool             // Tracks if authentication was successful
@@ -30,6 +34,10 @@ func NewAWSAuthFromAuth(fields map[string]string) (*AWSAuth, error) {
 		AccessKeyID:     []byte(fields["aws_access_key_id"]),     // Convert key ID to byte slice for security
 		SecretAccessKey: []byte(fields["aws_secret_access_key"]), // Convert secret key to byte slice for security
 		Region:          fields["aws_region"],                    // Set the region value
+		EmailHost:       fields["email_host"],                    // SMTP User
+		EmailPort:       fields["email_port"],                    // SMTP User
+		EmailUser:       []byte(fields["email_user"]),            // SMTP User
+		EmailPassword:   []byte(fields["email_password"]),        // SMTP PWD
 	}
 
 	// Validate the configuration to ensure all required fields are present

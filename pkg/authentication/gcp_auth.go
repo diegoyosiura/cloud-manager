@@ -16,6 +16,10 @@ type GCPAuth struct {
 	ProjectID     string          // The GCP project ID for the service account.
 	AuthJSON      string          // JSON-encoded credentials for the service account.
 	Authenticated bool            // Tracks if authentication was successful.
+	EmailHost     string          // SMTP Host
+	EmailPort     string          // SMTP Port
+	EmailUser     string          // SMTP User
+	EmailPassword string          // SMTP PWD
 	Client        *storage.Client // GCP Storage Client instance for interacting with resources.
 
 	mu sync.Mutex // Mutex to ensure thread-safe access to the struct.
@@ -36,6 +40,10 @@ func NewGCPAuthFromAuth(fields map[string]string) (*GCPAuth, error) {
 		Authenticated: false,                    // Set default authentication state to false.
 		ProjectID:     fields["gcp_project_id"], // Read the project ID from input.
 		AuthJSON:      fields["gcp_auth_json"],  // Read the credentials JSON from input.
+		EmailHost:     fields["email_host"],     // SMTP User
+		EmailPort:     fields["email_port"],     // SMTP User
+		EmailUser:     fields["email_user"],     // SMTP User
+		EmailPassword: fields["email_password"], // SMTP PWD
 	}
 	// Validate the configuration immediately after initialization.
 	return config, config.Validate()

@@ -1,9 +1,9 @@
 package compute
 
 import (
-	"cloud-manager/pkg/authentication"
 	"context"
 	"errors"
+	"github.com/diegoyosiura/cloud-manager/pkg/authentication"
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/core"
 )

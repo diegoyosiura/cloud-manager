@@ -1,9 +1,9 @@
 package main
 
 import (
-	"cloud-manager/internal/utils"
-	"cloud-manager/pkg/authentication"
 	"fmt"
+	"github.com/diegoyosiura/cloud-manager/internal/utils"
+	"github.com/diegoyosiura/cloud-manager/pkg/authentication"
 	"os"
 )
 

@@ -1,4 +1,4 @@
-module cloud-manager
+module github.com/diegoyosiura/cloud-manager
 
 go 1.23
 

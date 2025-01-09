@@ -1,8 +1,8 @@
 package messaging
 
 import (
-	"cloud-manager/pkg/authentication"
 	"fmt"
+	"github.com/diegoyosiura/cloud-manager/pkg/authentication"
 	"sync"
 )
 

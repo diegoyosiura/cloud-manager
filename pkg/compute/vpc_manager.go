@@ -1,8 +1,8 @@
 package compute
 
 import (
-	"cloud-manager/pkg/authentication"
 	"fmt"
+	"github.com/diegoyosiura/cloud-manager/pkg/authentication"
 )
 
 // Manager is a generic interface for managing VPCs across cloud providers.

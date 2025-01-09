@@ -1,9 +1,9 @@
 package messaging
 
 import (
-	"cloud-manager/pkg/authentication"
 	"context"
 	"fmt"
+	"github.com/diegoyosiura/cloud-manager/pkg/authentication"
 	"net/smtp"
 	"sync"
 	"time"

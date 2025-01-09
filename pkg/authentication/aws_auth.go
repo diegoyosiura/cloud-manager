@@ -1,12 +1,12 @@
 package authentication
 
 import (
-	"cloud-manager/internal/utils"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/diegoyosiura/cloud-manager/internal/utils"
 	"sync"
 )
 

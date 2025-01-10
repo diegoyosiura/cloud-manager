@@ -21,8 +21,6 @@ func NewAuthConfig(provider string, fields map[string]string) (*AuthConfig, erro
 		config, err = NewAWSAuthFromAuth(fields) // Initializes AWS-specific configuration.
 	case "azure":
 		config, err = NewAzureAuthFromAuth(fields) // Initializes Azure-specific configuration.
-	case "gcp":
-		config, err = NewGCPAuthFromAuth(fields) // Initializes GCP-specific configuration.
 	case "oci":
 		config, err = NewOCIAuthFromAuth(fields) // Initializes OCI-specific configuration.
 	default:

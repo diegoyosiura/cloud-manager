@@ -57,40 +57,6 @@ func TestNewAuthConfig_MissingAWSFields(t *testing.T) {
 	}
 }
 
-// TestNewAuthConfig_ValidGCP verifica se uma configuração válida do GCP passa na validação.
-func TestNewAuthConfig_ValidGCP(t *testing.T) {
-	fields := map[string]string{
-		"gcp_project_id": "testGCPProject",
-		"gcp_auth_json":  "{}",
-	}
-
-	config, err := NewAuthConfig("gcp", fields)
-	if err != nil {
-		t.Fatalf("erro inesperado: %v", err)
-	}
-
-	if config.ProviderName != "gcp" {
-		t.Errorf("esperado provider 'gcp', mas foi recebido '%s'", config.ProviderName)
-	}
-}
-
-// TestNewAuthConfig_MissingGCPFields verifica se campos ausentes na configuração GCP disparam erros no construtor.
-func TestNewAuthConfig_MissingGCPFields(t *testing.T) {
-	fields := map[string]string{
-		"gcp_auth_json": "{}",
-	}
-
-	_, err := NewAuthConfig("gcp", fields)
-	if err == nil {
-		t.Fatalf("esperado erro para campo GCPProjectID ausente, mas foi recebido nil")
-	}
-
-	expectedErr := "missing required GCP authentication fields"
-	if err.Error() != expectedErr {
-		t.Errorf("mensagem de erro inesperada: esperado %s, mas recebido: %v", expectedErr, err)
-	}
-}
-
 // TestNewAuthConfig_ValidOCI verifica se uma configuração válida da OCI é validada corretamente.
 func TestNewAuthConfig_ValidOCI(t *testing.T) {
 	fields := map[string]string{

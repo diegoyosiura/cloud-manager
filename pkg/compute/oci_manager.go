@@ -2,7 +2,6 @@ package compute
 
 import (
 	"context"
-	"errors"
 	"github.com/diegoyosiura/cloud-manager/pkg/authentication"
 	"github.com/oracle/oci-go-sdk/v65/common"
 	"github.com/oracle/oci-go-sdk/v65/core"
@@ -30,13 +29,8 @@ func (m *OCIManager) ListVPCs(fields map[string]interface{}, enum core.InstanceL
 	}
 
 	request := convertMapInstanceRequest(fields)
+	request.CompartmentId = &m.Auth.CompartmentID
 	request.LifecycleState = enum
-
-	if value, ok := fields["oci_compartment_id"]; !ok {
-		return nil, errors.New("oci_compartment_id is required")
-	} else {
-		request.CompartmentId = common.String(value.(string))
-	}
 
 	resp, err := m.Client.ListInstances(context.Background(), request)
 

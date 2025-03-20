@@ -38,7 +38,7 @@ func OCIInstanceToVPC(instance core.Instance) VPC {
 	vpc := VPC{
 		ID:          *instance.Id,
 		Name:        *instance.DisplayName,
-		Region:      *instance.Region,
+		Region:      *instance.AvailabilityDomain,
 		Provider:    "oci",
 		Description: *instance.Shape,
 

@@ -214,24 +214,28 @@ func (m *AWSManager) GetVPC(id string) (*VPC, error) {
 	return &response[0], nil
 }
 func (m *AWSManager) Start(id string) (*VPC, error) {
-	_, output := m.Ec2Svc.StartInstancesRequest(&ec2.StartInstancesInput{InstanceIds: []*string{&id}})
-
-	if len(output.StartingInstances) != 1 {
-		return nil, errors.New("invalid instance count")
+	request, _ := m.Ec2Svc.StartInstancesRequest(&ec2.StartInstancesInput{InstanceIds: []*string{&id}})
+	err := request.Send()
+	if err != nil {
+		return nil, err
 	}
-	return m.GetVPC(*output.StartingInstances[0].InstanceId)
+	return m.GetVPC(id)
 }
 
 func (m *AWSManager) Stop(id string) (*VPC, error) {
-	_, output := m.Ec2Svc.StopInstancesRequest(&ec2.StopInstancesInput{InstanceIds: []*string{&id}})
-
-	if len(output.StoppingInstances) != 1 {
-		return nil, errors.New("invalid instance count")
+	request, _ := m.Ec2Svc.StopInstancesRequest(&ec2.StopInstancesInput{InstanceIds: []*string{&id}})
+	err := request.Send()
+	if err != nil {
+		return nil, err
 	}
-	return m.GetVPC(*output.StoppingInstances[0].InstanceId)
+	return m.GetVPC(id)
 }
 
 func (m *AWSManager) Restart(id string) (*VPC, error) {
-	_, _ = m.Ec2Svc.RebootInstancesRequest(&ec2.RebootInstancesInput{InstanceIds: []*string{&id}})
+	request, _ := m.Ec2Svc.RebootInstancesRequest(&ec2.RebootInstancesInput{InstanceIds: []*string{&id}})
+	err := request.Send()
+	if err != nil {
+		return nil, err
+	}
 	return m.GetVPC(id)
 }

@@ -16,9 +16,12 @@ type Manager interface {
 	ListDeletingVPCs(map[string]interface{}) ([]VPC, error) // Lists VPCs in "Deleting" state.
 	ListDeletedVPCs(map[string]interface{}) ([]VPC, error)  // Lists VPCs in "Deleted" state.
 	ListAllVPCs(map[string]interface{}) ([]VPC, error)      // Lists VPCs across all states.
-	CreateVPC(name, cidr string) (VPC, error)               // Creates a new VPC.
+	CreateVPC(name, cidr string) (*VPC, error)              // Creates a new VPC.
 	DeleteVPC(id string) error                              // Deletes a VPC by ID.
-	GetVPC(id string) (VPC, error)                          // Retrieves a specific VPC by ID.
+	GetVPC(id string) (*VPC, error)                         // Retrieves a specific VPC by ID.
+	Start(id string) (*VPC, error)                          // Start a VPC by ID.
+	Stop(id string) (*VPC, error)                           // Stop a VPC by ID.
+	Restart(id string) (*VPC, error)                        // Reboot a VPC by ID.
 }
 
 // NewVPCManager is a factory function that returns a Manager implementation based on the cloud provider.

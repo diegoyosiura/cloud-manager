@@ -1,6 +1,7 @@
 package compute
 
 import (
+	"errors"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/diegoyosiura/cloud-manager/pkg/authentication"
@@ -167,8 +168,8 @@ func (m *AWSManager) ListAllVPCs(fields map[string]interface{}) ([]VPC, error) {
 // Returns:
 //   - A `VPC` object representing the created VPC (placeholder).
 //   - An error if the operation fails.
-func (m *AWSManager) CreateVPC(name, cidr string) (VPC, error) {
-	return VPC{}, nil
+func (m *AWSManager) CreateVPC(name, cidr string) (*VPC, error) {
+	return &VPC{}, nil
 }
 
 // DeleteVPC deletes a VPC with the specified ID.
@@ -188,6 +189,49 @@ func (m *AWSManager) DeleteVPC(id string) error {
 // Returns:
 //   - A `VPC` object representing the retrieved VPC (placeholder).
 //   - An error if the operation fails.
-func (m *AWSManager) GetVPC(id string) (VPC, error) {
-	return VPC{}, nil
+func (m *AWSManager) GetVPC(id string) (*VPC, error) {
+	// Lazily initialize Ec2Svc if not already set
+	if m.Ec2Svc == nil {
+		m.Ec2Svc = ec2.New(m.Auth.Session)
+	}
+
+	result, err := m.Ec2Svc.DescribeInstances(&ec2.DescribeInstancesInput{InstanceIds: []*string{&id}})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var response []VPC
+	for _, reservation := range result.Reservations {
+		for _, instance := range reservation.Instances {
+			response = append(response, AWSInstanceToVPC(instance))
+		}
+	}
+
+	if len(response) != 1 {
+		return nil, errors.New("invalid instance count")
+	}
+	return &response[0], nil
+}
+func (m *AWSManager) Start(id string) (*VPC, error) {
+	_, output := m.Ec2Svc.StartInstancesRequest(&ec2.StartInstancesInput{InstanceIds: []*string{&id}})
+
+	if len(output.StartingInstances) != 1 {
+		return nil, errors.New("invalid instance count")
+	}
+	return m.GetVPC(*output.StartingInstances[0].InstanceId)
+}
+
+func (m *AWSManager) Stop(id string) (*VPC, error) {
+	_, output := m.Ec2Svc.StopInstancesRequest(&ec2.StopInstancesInput{InstanceIds: []*string{&id}})
+
+	if len(output.StoppingInstances) != 1 {
+		return nil, errors.New("invalid instance count")
+	}
+	return m.GetVPC(*output.StoppingInstances[0].InstanceId)
+}
+
+func (m *AWSManager) Restart(id string) (*VPC, error) {
+	_, _ = m.Ec2Svc.RebootInstancesRequest(&ec2.RebootInstancesInput{InstanceIds: []*string{&id}})
+	return m.GetVPC(id)
 }

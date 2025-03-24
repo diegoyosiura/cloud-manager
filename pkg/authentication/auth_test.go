@@ -60,6 +60,7 @@ func TestNewAuthConfig_MissingAWSFields(t *testing.T) {
 // TestNewAuthConfig_ValidOCI verifica se uma configuração válida da OCI é validada corretamente.
 func TestNewAuthConfig_ValidOCI(t *testing.T) {
 	fields := map[string]string{
+		"oci_compartment_id": "compartmentID",
 		"oci_tenancy_id":     "testTenancyID",
 		"oci_user_id":        "testUserID",
 		"oci_region":         "us-ashburn-1",
@@ -92,7 +93,7 @@ func TestNewAuthConfig_MissingOCIFields(t *testing.T) {
 		t.Fatalf("esperado erro para campo OCITenancyID ausente, mas foi recebido nil")
 	}
 
-	expectedErr := "tenancy ID is required"
+	expectedErr := "compartment ID is required"
 	if err.Error() != expectedErr {
 		t.Errorf("mensagem de erro inesperada: esperado %s, mas recebido: %v", expectedErr, err)
 	}

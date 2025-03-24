@@ -111,14 +111,101 @@ func (m *OCIManager) ListAllVPCs(fields map[string]interface{}) ([]VPC, error) {
 	}
 	return response, nil
 }
-func (m *OCIManager) CreateVPC(name, cidr string) (VPC, error) {
-	return VPC{}, nil
+func (m *OCIManager) CreateVPC(name, cidr string) (*VPC, error) {
+	return &VPC{}, nil
 }
-
 func (m *OCIManager) DeleteVPC(id string) error {
 	return nil
 }
 
-func (m *OCIManager) GetVPC(id string) (VPC, error) {
-	return VPC{}, nil
+func (m *OCIManager) GetVPC(id string) (*VPC, error) {
+	if m.Client == nil {
+		cl, err := core.NewComputeClientWithConfigurationProvider(m.Auth.GetConfigurationProvider())
+		if err != nil {
+			return nil, err
+		}
+		m.Client = &cl
+	}
+
+	request := core.GetInstanceRequest{InstanceId: &id}
+	response, err := m.Client.GetInstance(context.Background(), request)
+
+	if err != nil {
+		return nil, err
+	}
+	vpc := OCIInstanceToVPC(response.Instance)
+
+	return &vpc, err
+}
+
+func (m *OCIManager) Start(id string) (*VPC, error) {
+	if m.Client == nil {
+		cl, err := core.NewComputeClientWithConfigurationProvider(m.Auth.GetConfigurationProvider())
+		if err != nil {
+			return nil, err
+		}
+		m.Client = &cl
+	}
+
+	request := core.InstanceActionRequest{
+		InstanceId: &id,
+		Action:     core.InstanceActionActionStart,
+	}
+	response, err := m.Client.InstanceAction(context.Background(), request)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vpc := OCIInstanceToVPC(response.Instance)
+
+	return &vpc, err
+}
+
+func (m *OCIManager) Stop(id string) (*VPC, error) {
+	if m.Client == nil {
+		cl, err := core.NewComputeClientWithConfigurationProvider(m.Auth.GetConfigurationProvider())
+		if err != nil {
+			return nil, err
+		}
+		m.Client = &cl
+	}
+
+	request := core.InstanceActionRequest{
+		InstanceId: &id,
+		Action:     core.InstanceActionActionStop,
+	}
+	response, err := m.Client.InstanceAction(context.Background(), request)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vpc := OCIInstanceToVPC(response.Instance)
+
+	return &vpc, err
+}
+
+func (m *OCIManager) Restart(id string) (*VPC, error) {
+	if m.Client == nil {
+		cl, err := core.NewComputeClientWithConfigurationProvider(m.Auth.GetConfigurationProvider())
+		if err != nil {
+			return nil, err
+		}
+		m.Client = &cl
+	}
+
+	request := core.InstanceActionRequest{
+		InstanceId: &id,
+		Action:     core.InstanceActionActionReset,
+	}
+	response, err := m.Client.InstanceAction(context.Background(), request)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vpc := OCIInstanceToVPC(response.Instance)
+
+	return &vpc, err
 }

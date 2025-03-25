@@ -19,7 +19,7 @@ type OCIManager struct {
 // - fields: A generic map where keys (e.g., "oci_compartment_id") provide filtering options.
 // - enum: The lifecycle state to filter VPCs (e.g., Running, Stopped).
 // Returns: A list of filtered VPCs or an error if the request fails.
-func (m *OCIManager) ListVPCs(fields map[string]interface{}, enum core.InstanceLifecycleStateEnum) ([]VPC, error) {
+func (m *OCIManager) ListVPCs(fields map[string]interface{}, enum *core.InstanceLifecycleStateEnum) ([]VPC, error) {
 	if m.Client == nil {
 		cl, err := core.NewComputeClientWithConfigurationProvider(m.Auth.GetConfigurationProvider())
 		if err != nil {
@@ -30,7 +30,10 @@ func (m *OCIManager) ListVPCs(fields map[string]interface{}, enum core.InstanceL
 
 	request := convertMapInstanceRequest(fields)
 	request.CompartmentId = &m.Auth.CompartmentID
-	request.LifecycleState = enum
+
+	if enum != nil {
+		request.LifecycleState = *enum
+	}
 
 	resp, err := m.Client.ListInstances(context.Background(), request)
 
@@ -70,46 +73,41 @@ func convertMapInstanceRequest(fields map[string]interface{}) core.ListInstances
 // - ListAllVPCs: Aggregates all VPCs from any lifecycle state.
 
 func (m *OCIManager) ListRunningVPCs(fields map[string]interface{}) ([]VPC, error) {
-	return m.ListVPCs(fields, core.InstanceLifecycleStateRunning)
+	ils := core.InstanceLifecycleStateRunning
+	return m.ListVPCs(fields, &ils)
 }
 
 func (m *OCIManager) ListStartingVPCs(fields map[string]interface{}) ([]VPC, error) {
-	return m.ListVPCs(fields, core.InstanceLifecycleStateStarting)
+	ils := core.InstanceLifecycleStateStarting
+	return m.ListVPCs(fields, &ils)
 }
 
 func (m *OCIManager) ListStoppingVPCs(fields map[string]interface{}) ([]VPC, error) {
-	return m.ListVPCs(fields, core.InstanceLifecycleStateStopping)
+	ils := core.InstanceLifecycleStateStopping
+	return m.ListVPCs(fields, &ils)
 }
 func (m *OCIManager) ListStoppedVPCs(fields map[string]interface{}) ([]VPC, error) {
-	return m.ListVPCs(fields, core.InstanceLifecycleStateStopped)
+	ils := core.InstanceLifecycleStateStopped
+	return m.ListVPCs(fields, &ils)
 }
 
 func (m *OCIManager) ListCreatingVPCs(fields map[string]interface{}) ([]VPC, error) {
-	return m.ListVPCs(fields, core.InstanceLifecycleStateProvisioning)
+	ils := core.InstanceLifecycleStateProvisioning
+	return m.ListVPCs(fields, &ils)
 }
 
 func (m *OCIManager) ListDeletingVPCs(fields map[string]interface{}) ([]VPC, error) {
-	return m.ListVPCs(fields, core.InstanceLifecycleStateTerminating)
+	ils := core.InstanceLifecycleStateTerminating
+	return m.ListVPCs(fields, &ils)
 }
 
 func (m *OCIManager) ListDeletedVPCs(fields map[string]interface{}) ([]VPC, error) {
-	return m.ListVPCs(fields, core.InstanceLifecycleStateTerminated)
+	ils := core.InstanceLifecycleStateTerminated
+	return m.ListVPCs(fields, &ils)
 }
 
 func (m *OCIManager) ListAllVPCs(fields map[string]interface{}) ([]VPC, error) {
-	var response []VPC
-
-	for _, v := range core.GetInstanceLifecycleStateEnumStringValues() {
-		state, _ := core.GetMappingInstanceLifecycleStateEnum(v)
-		vpcs, err := m.ListVPCs(fields, state)
-
-		if err != nil {
-			return nil, err
-		}
-
-		response = append(response, vpcs...)
-	}
-	return response, nil
+	return m.ListVPCs(fields, nil)
 }
 func (m *OCIManager) CreateVPC(name, cidr string) (*VPC, error) {
 	return &VPC{}, nil

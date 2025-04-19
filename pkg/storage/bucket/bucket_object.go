@@ -32,11 +32,24 @@ func NewBucketObjectFromAWS(o *s3.Object) BucketObject {
 		tier = STierTierArchive
 		break
 	}
+	lastModified := time.Now()
+	key := ""
+	size := int64(0)
+	if o.LastModified != nil {
+		lastModified = *o.LastModified
+	}
+
+	if o.Key != nil {
+		key = *o.Key
+	}
+	if o.Size != nil {
+		size = *o.Size
+	}
 
 	return BucketObject{
-		Key:          *o.Key,
-		LastModified: *o.LastModified,
-		Size:         *o.Size,
+		Key:          key,
+		LastModified: lastModified,
+		Size:         size,
 		StorageClass: tier,
 	}
 }
@@ -54,15 +67,24 @@ func NewBucketObjectFromOCI(o objectstorage.ObjectSummary) BucketObject {
 		tier = STierTierArchive
 		break
 	}
-	modfied := time.Now()
-
+	lastModified := time.Now()
+	key := ""
+	size := int64(0)
 	if o.TimeModified != nil {
-		modfied = o.TimeModified.Time
+		lastModified = o.TimeModified.Time
 	}
+
+	if o.Name != nil {
+		key = *o.Name
+	}
+	if o.Size != nil {
+		size = *o.Size
+	}
+
 	return BucketObject{
-		Key:          *o.Name,
-		LastModified: modfied,
-		Size:         *o.Size,
+		Key:          key,
+		LastModified: lastModified,
+		Size:         size,
 		StorageClass: tier,
 	}
 }

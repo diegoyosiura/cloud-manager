@@ -54,9 +54,14 @@ func NewBucketObjectFromOCI(o objectstorage.ObjectSummary) BucketObject {
 		tier = STierTierArchive
 		break
 	}
+	modfied := time.Now()
+
+	if o.TimeModified != nil {
+		modfied = o.TimeModified.Time
+	}
 	return BucketObject{
 		Key:          *o.Name,
-		LastModified: o.TimeModified.Time,
+		LastModified: modfied,
 		Size:         *o.Size,
 		StorageClass: tier,
 	}

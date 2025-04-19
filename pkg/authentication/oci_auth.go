@@ -19,6 +19,7 @@ import (
 // OCIAuth is a struct that encapsulates the configuration and state required
 // to authenticate with Oracle Cloud Infrastructure (OCI) services.
 type OCIAuth struct {
+	Namespace     string // The Namespace of the account.
 	CompartmentID string // The Compartment ID of the account (mandatory).
 	TenancyID     string // The tenancy ID of the account (mandatory).
 	UserID        string // The user ID in the tenancy (mandatory).
@@ -52,6 +53,7 @@ func NewOCIAuthFromAuth(fields map[string]string) (*OCIAuth, error) {
 	config := &OCIAuth{
 		mu:            sync.Mutex{},                 // Initializes the mutex for thread safety.
 		Authenticated: false,                        // Authentication is set to "false" by default.
+		Namespace:     fields["oci_namespace"],      // Reads the namespace from the input fields.
 		CompartmentID: fields["oci_compartment_id"], // Reads the compartment ID from the input fields.
 		TenancyID:     fields["oci_tenancy_id"],     // Reads the tenancy ID from the input fields.
 		UserID:        fields["oci_user_id"],        // Reads the user ID from the input fields.
